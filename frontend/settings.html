@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | Settings</title>
+    <link rel="stylesheet" href="dashboard.css?v=2">
+    <style>
+        .settings-card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #eee;
+        }
+        .settings-card h2 {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            color: #1a4bbd;
+        }
+        .setting-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        .setting-group label {
+            color: #333;
+            font-weight: bold;
+        }
+        .action-btn {
+            padding: 8px 16px;
+            background-color: #1a4bbd;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .action-btn:hover { background-color: #163d9e; }
+        .danger-btn { background-color: #f44336; }
+        .danger-btn:hover { background-color: #da190b; }
+        .toggle-switch {
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+        }
+        .toggle-switch.active { background: #1a4bbd; }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .toggle-switch.active::after { left: 28px; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Jenie</h2>
+        <a href="dashboard.html">Home</a>
+        <a href="tax_calculator.html">Tax Calculator</a>
+        <a href="emi_calculator.html">EMI Calculator</a>
+        <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="profile.html">Profile</a>
+        <a href="settings.html" class="active">Settings</a>
+    </div>
+
+    <!-- Main area -->
+    <div class="main">
+        <div class="topbar">
+            <h1>Settings</h1>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div class="content">
+            <div class="settings-card">
+                <h2>Preferences</h2>
+                
+                <div class="setting-group">
+                    <label>Email Notifications</label>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <div class="setting-group">
+                    <label>Dark Mode (Preview)</label>
+                    <div class="toggle-switch" onclick="alert('Dark mode coming soon!')"></div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h2>Account Options</h2>
+                
+                <div class="setting-group">
+                    <label>Change Password</label>
+                    <button class="action-btn" onclick="alert('Password reset link sent to your email!')">Reset Password</button>
+                </div>
+
+                <div class="setting-group">
+                    <label>Clear Local Data</label>
+                    <button class="action-btn danger-btn" onclick="clearData()">Clear All Data</button>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align: center; margin-top: auto; padding: 10px; font-size: 14px; color: #666;">
+            &copy; 2026 Jenie. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            window.location.href = "login.html";
+        }
+        function clearData() {
+            if(confirm("Are you sure you want to clear your local data? This will log you out.")) {
+                let user = localStorage.getItem("loggedInUser");
+                if (user) {
+                    localStorage.removeItem(user);
+                }
+                localStorage.removeItem("loggedInUser");
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>

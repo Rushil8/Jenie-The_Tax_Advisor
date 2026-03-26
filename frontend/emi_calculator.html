@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | EMI Calculator</title>
+    <link rel="stylesheet" href="dashboard.css?v=2">
+    <link rel="stylesheet" href="emi_calculator.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Jenie</h2>
+        <a href="dashboard.html">Home</a>
+        <a href="tax_calculator.html">Tax Calculator</a>
+        <a href="emi_calculator.html" class="active">EMI Calculator</a>
+        <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="profile.html">Profile</a>
+        <a href="settings.html">Settings</a>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>EMI Calculator</h1>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div class="content emi-content">
+            <div class="calc-container">
+                <h2>Calculate Your Loan EMI</h2>
+                <form id="emiForm">
+                    <div class="form-group">
+                        <label for="principal">Loan Amount (Principal):</label>
+                        <input type="number" id="principal" name="principal" placeholder="e.g. 100000" required min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rate">Annual Interest Rate (%):</label>
+                        <input type="number" id="rate" name="rate" placeholder="e.g. 7.5" step="0.01" required min="0.1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="months">Loan Tenure (in months):</label>
+                        <input type="number" id="months" name="months" placeholder="e.g. 60" required min="1">
+                    </div>
+                    
+                    <button type="submit" class="calc-btn">Calculate EMI</button>
+                    <button type="reset" class="reset-btn" onclick="clearResult()">Reset</button>
+                </form>
+
+                <div id="emiResult" class="result-box" style="display: none;">
+                    <h3>Your Monthly EMI: <span id="emiValue">0</span></h3>
+                    <p>Total Interest Payable: <span id="totalInterest">0</span></p>
+                    <p>Total Payment (Principal + Interest): <span id="totalPayment">0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align: center; margin-top: auto; padding: 10px; font-size: 14px; color: #666;">
+            &copy; 2026 Jenie. All rights reserved.
+        </footer>
+    </div>
+
+    <script src="../backend/emi_calculator.js"></script>
+    <script>
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+
+</html>

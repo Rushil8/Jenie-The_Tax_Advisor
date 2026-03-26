@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css?v=2">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Jenie</h2>
+        <a href="dashboard.html" class="active">Home</a>
+        <a href="tax_calculator.html">Tax Calculator</a>
+        <a href="emi_calculator.html">EMI Calculator</a>
+        <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="profile.html">Profile</a>
+        <a href="settings.html">Settings</a>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>Dashboard</h1>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div class="content">
+            <h2 id="welcomeMsg">Welcome to Jenie</h2>
+            <p style="margin-bottom: 30px;">Your Personal Tax Assistant.</p>
+
+            <div class="news-section">
+                <h2 style="color: #1a4bbd; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">Latest Financial & Tax News</h2>
+                <div id="newsContainer">
+                    <p style="color: #666; font-size: 14px;">Loading latest news...</p>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align: center; margin-top: auto; padding: 10px; font-size: 14px; color: #666;">
+            &copy; 2026 Jenie. All rights reserved.
+        </footer>
+    </div>
+
+    <script src="../backend/dashboard.js"></script>
+</body>
+
+</html>

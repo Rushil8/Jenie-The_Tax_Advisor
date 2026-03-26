@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | Admin</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <div class="topbar">
+        <h1>Admin Dashboard</h1>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div style="padding: 20px;">
+
+        <h2>Add New Tax Slab</h2>
+        <form id="slabForm">
+            <label>Year</label><br>
+            <input type="number" id="year" placeholder="e.g. 2026" required><br><br>
+
+            <label>Tax Regime</label><br>
+            <select id="regime" required>
+                <option value="Old">Old Regime</option>
+                <option value="New">New Regime</option>
+            </select><br><br>
+
+            <label>Age Category</label><br>
+            <select id="category" required>
+                <option value="Normal">Normal (Below 60)</option>
+                <option value="Senior">Senior (60 to 79)</option>
+                <option value="Super-Senior">Super-Senior (80 and above)</option>
+            </select><br><br>
+
+            <label>Min Income (₹)</label><br>
+            <input type="number" id="minIncome" placeholder="e.g. 0" required><br><br>
+
+            <label>Max Income (₹)</label><br>
+            <input type="number" id="maxIncome" placeholder="0 = No Limit"><br><br>
+
+            <label>Tax Rate (%)</label><br>
+            <input type="number" id="taxRate" placeholder="e.g. 5" required><br><br>
+
+            <button type="submit" id="submitBtn">Add Slab</button>
+            <button type="button" id="cancelEditBtn" style="display:none; background-color: #666;">Cancel Edit</button>
+        </form>
+
+        <hr>
+
+        <h2>Saved Tax Slabs</h2>
+        <button id="clearBtn">Clear All</button>
+        <br><br>
+        <table id="slabTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Year</th>
+                    <th>Regime</th>
+                    <th>Category</th>
+                    <th>Min Income (₹)</th>
+                    <th>Max Income (₹)</th>
+                    <th>Tax Rate (%)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="slabBody"></tbody>
+        </table>
+        <p id="emptyMsg">No tax slabs added yet.</p>
+
+    </div>
+
+    <div style="padding: 20px; border-top: 1px solid #ccc;">
+        <h2>Registered Users</h2>
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="userBody"></tbody>
+        </table>
+        <p id="emptyUserMsg">No users registered yet.</p>
+    </div>
+
+    <script src="../backend/admin.js"></script>
+
+    <footer style="text-align: center; margin-top: 20px; padding: 10px; font-size: 14px; color: #666;">
+        &copy; 2026 Jenie. All rights reserved.
+    </footer>
+</body>
+
+</html>

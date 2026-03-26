@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | Profile</title>
+    <link rel="stylesheet" href="profile.css">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Jenie</h2>
+        <a href="dashboard.html">Home</a>
+        <a href="tax_calculator.html">Tax Calculator</a>
+        <a href="emi_calculator.html">EMI Calculator</a>
+        <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="profile.html" class="active">Profile</a>
+        <a href="settings.html">Settings</a>
+    </div>
+
+    <!-- Main area -->
+    <div class="main">
+
+        <!-- Top bar -->
+        <div class="topbar">
+            <h1>My Profile</h1>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="profile-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2>User Information</h2>
+                    <button id="editBtn" onclick="toggleEdit()" style="padding: 6px 12px; background: #1a4bbd; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit Profile</button>
+                    <button id="saveBtn" onclick="saveProfile()" style="display: none; padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+                </div>
+                <hr>
+
+                <div class="info-group">
+                    <label>Full Name</label>
+                    <p id="profileName">Loading...</p>
+                    <input type="text" id="editName" style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
+                </div>
+
+                <div class="info-group">
+                    <label>Username</label>
+                    <p id="profileUsername">Loading...</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Email Address</label>
+                    <p id="profileEmail">Loading...</p>
+                    <input type="email" id="editEmail" style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
+                </div>
+
+                <div class="info-group">
+                    <label>Phone Number</label>
+                    <p id="profilePhone">Loading...</p>
+                    <input type="text" id="editPhone" style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
+                </div>
+
+            </div>
+
+            <div class="profile-card history-card" style="margin-top: 30px; width: 650px;">
+                <h2>Tax Calculation History</h2>
+                <hr>
+                <div id="historyContainer">
+                    <p id="noHistoryMsg" style="color: #666; font-size: 14px;">No calculations found yet.</p>
+                    <table id="historyTable"
+                        style="display:none; width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead style="background-color: #f0f0f0; border-bottom: 2px solid #ddd;">
+                            <tr>
+                                <th style="padding: 10px; text-align: left;">Date</th>
+                                <th style="padding: 10px; text-align: left;">Year</th>
+                                <th style="padding: 10px; text-align: left;">Gross Income</th>
+                                <th style="padding: 10px; text-align: left;">Net Taxable</th>
+                                <th style="padding: 10px; text-align: left;">Total Tax</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align: center; margin-top: auto; padding: 10px; font-size: 14px; color: #666;">
+            &copy; 2026 Jenie. All rights reserved.
+        </footer>
+    </div>
+
+    <script src="../backend/profile.js"></script>
+</body>
+
+</html>

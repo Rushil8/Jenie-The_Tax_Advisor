@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | Tax Calculator</title>
+    <link rel="stylesheet" href="tax_calculator.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Jenie</h2>
+        <a href="dashboard.html">Home</a>
+        <a href="tax_calculator.html" class="active">Tax Calculator</a>
+        <a href="emi_calculator.html">EMI Calculator</a>
+        <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="profile.html">Profile</a>
+        <a href="settings.html">Settings</a>
+    </div>
+
+    <div class="main">
+
+        <div class="topbar">
+            <h1>Tax Calculator</h1>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div class="content">
+
+            <h2>Calculate Your Tax</h2>
+            <form id="taxForm">
+                <label>Assessment Year</label><br>
+                <select id="year"></select><br><br>
+
+                <label>Tax Regime</label><br>
+                <select id="regime" required>
+                    <option value="Old">Old Regime</option>
+                    <option value="New">New Regime</option>
+                </select><br><br>
+
+                <label>Age Category</label><br>
+                <select id="category" required>
+                    <option value="Normal">Normal (Below 60)</option>
+                    <option value="Senior">Senior (60 to 79)</option>
+                    <option value="Super-Senior">Super-Senior (80 and above)</option>
+                </select><br><br>
+
+                <label>Annual Salary/Income (₹)</label><br>
+                <input type="number" id="income" placeholder="e.g. 600000" required><br><br>
+
+                <label>Other Income (Interest, Rent, etc.) (₹)</label><br>
+                <input type="number" id="otherIncome" placeholder="e.g. 50000" value="0"><br><br>
+
+                <fieldset style="border:1px solid #cccccc; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                    <legend style="font-weight:bold; color:#000000; padding:0 5px; font-size: 14px;">Expenses &
+                        Deductions</legend>
+
+                    <label>Investments (80C)</label>
+                    <button type="button"
+                        onclick="alert('Section 80C (Max ₹1.5 Lakh limit):\n\nIncludes:\n EPF & PPF (Provident Funds)\n Life Insurance Premiums\n ELSS Mutual Funds\n 5-Year Tax Saving FDs\n Home Loan Principal Repayment\n Tuition Fees for children')">?</button><br>
+                    <input type="number" id="inv80c" placeholder="Max 1.5L" value="0"><br><br>
+
+                    <label>Health Insurance (80D)</label>
+                    <button type="button"
+                        onclick="alert('Section 80D (Health Insurance Limit):\n\n Self & Family: Up to ₹25,000\n Parents (below 60 yrs): Extra ₹25,000\n Senior Citizen Parents (60+ yrs): Extra ₹50,000\n\nIncludes ₹5,000 limit for preventive health check-up.')">?</button><br>
+                    <input type="number" id="healthIns" placeholder="e.g. 25000" value="0"><br><br>
+
+                    <label>Home Loan Interest (24b)</label>
+                    <button type="button"
+                        onclick="alert('Section 24(b) (Home Loan Interest):\n\n For Self-Occupied Property: Max deduction is ₹2 Lakh on the interest paid.\n For Rented Property: The entire interest paid can be claimed, subject to set-off rules.')">?</button><br>
+                    <input type="number" id="homeLoan" placeholder="Max 2L" value="0"><br><br>
+
+                    <label>Other Deductions</label>
+                    <button type="button"
+                        onclick="alert('Other Common Deductions:\n\n 80TTA: Savings Bank Interest up to ₹10,000\n 80E: Full Interest paid on Education Loan\n 80G: Donations to approved charities (50% or 100% deduction)\n 80CCD(1B): Extra ₹50,000 for NPS')">?</button><br>
+                    <input type="number" id="otherDeductions" placeholder="e.g. 10000" value="0"><br>
+                </fieldset>
+
+                <button type="submit">Calculate Tax</button>
+            </form>
+
+
+            <div id="resultBox" style="display:none;">
+                <h2>Tax Breakdown</h2>
+                <table id="breakdownTable">
+                    <th>
+                        <tr>
+                            <th>Slab Range (₹)</th>
+                            <th>Tax Rate (%)</th>
+                            <th>Taxable Amount (₹)</th>
+                            <th>Tax (₹)</th>
+                        </tr>
+                    </th>
+                    <tbody id="breakdownBody"></tbody>
+                </table>
+                <p id="totalTax"></p>
+                <p id="effectiveRate"></p>
+            </div>
+
+            <p id="noSlabMsg" style="display:none; color:red;">
+                No tax slabs found for the selected year. Please ask the admin to add slabs first.
+            </p>
+
+        </div>
+
+        <footer style="text-align: center; margin-top: auto; padding: 10px; font-size: 14px; color: #666;">
+            &copy; 2026 Jenie. All rights reserved.
+        </footer>
+    </div>
+
+    <script src="../backend/tax_calculator.js"></script>
+</body>
+
+</html>

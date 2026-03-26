@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | Register</title>
+    <link rel="stylesheet" href="register.css">
+</head>
+
+<body>
+    <div class="register-container">
+        <h1 align="center">Create Account</h1>
+        <form id="registerForm">
+            <label>Full Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+            <label>Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+
+            <label>Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+            <label>Phone Number</label>
+            <input type="tel" id="phone_number" name="phone_number" placeholder="Enter your phone number" required>
+
+            <label>Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+            <button type="submit">Register</button>
+            <p id="message"></p>
+            <label>Already have an account? <a href="login.html">Login Here</a></label>
+        </form>
+    </div>
+
+    <script src="../backend/register.js"></script>
+    <footer style="text-align: center; margin-top: 20px; padding: 10px; font-size: 14px; color: #666;">
+        &copy; 2026 Jenie. All rights reserved.
+    </footer>
+</body>
+
+</html>

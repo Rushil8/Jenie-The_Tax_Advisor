@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | Currency Exchange</title>
+    <link rel="stylesheet" href="currency_exchange.css">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Jenie</h2>
+        <a href="dashboard.html">Home</a>
+        <a href="tax_calculator.html">Tax Calculator</a>
+        <a href="emi_calculator.html">EMI Calculator</a>
+        <a href="currency_exchange.html" class="active">Currency Exchange</a>
+        <a href="profile.html">Profile</a>
+        <a href="settings.html">Settings</a>
+    </div>
+
+    <!-- Main area -->
+    <div class="main">
+
+        <!-- Top bar -->
+        <div class="topbar">
+            <h1>Currency Exchange</h1>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+
+            <div class="exchange-card">
+                <h2>Live Currency Converter</h2>
+                <hr>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" id="amount" value="1" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row" style="align-items: center;">
+                    <div class="form-group">
+                        <label>From</label>
+                        <select id="fromCurrency">
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                            <option value="INR" selected>INR - Indian Rupee</option>
+                            <option value="AUD">AUD - Australian Dollar</option>
+                            <option value="CAD">CAD - Canadian Dollar</option>
+                            <option value="SGD">SGD - Singapore Dollar</option>
+                            <option value="JPY">JPY - Japanese Yen</option>
+                            <option value="CNY">CNY - Chinese Yuan</option>
+                        </select>
+                    </div>
+
+                    <button id="swapBtn" class="swap-btn" title="Swap Currencies">⇄</button>
+
+                    <div class="form-group">
+                        <label>To</label>
+                        <select id="toCurrency">
+                            <option value="USD" selected>USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                            <option value="INR">INR - Indian Rupee</option>
+                            <option value="AUD">AUD - Australian Dollar</option>
+                            <option value="CAD">CAD - Canadian Dollar</option>
+                            <option value="SGD">SGD - Singapore Dollar</option>
+                            <option value="JPY">JPY - Japanese Yen</option>
+                            <option value="CNY">CNY - Chinese Yuan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="result-box">
+                    <p id="conversionRate">1 INR = ...</p>
+                    <h3 id="conversionResult">Loading...</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <footer style="text-align: center; margin-top: auto; padding: 10px; font-size: 14px; color: #666;">
+            &copy; 2026 Jenie. All rights reserved.
+        </footer>
+    </div>
+
+    <script src="../backend/currency_exchange.js"></script>
+</body>
+
+</html>
