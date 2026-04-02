@@ -8,11 +8,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Enable cross-origin requests from frontend
+# Allow requests from your future Netlify URL (or all origins '*' for testing)
+CORS(app) 
 
 @app.route('/')
 def home():
-    return "Jenie AI Backend is running!"
+    return "Jenie AI Backend is Live and Secure!"
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -49,6 +50,5 @@ def chat():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Get port from environment variable (for Render/Heroku)
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
