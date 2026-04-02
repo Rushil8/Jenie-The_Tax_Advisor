@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenie | Tax Saving Tips</title>
+    <meta name="description"
+        content="Get personalized AI-powered tax saving tips based on your income, age, and financial profile.">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="tax_tips.css">
+    <script src="../backend/theme.js"></script>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Jenie</h2>
+        <a href="dashboard.html">Home</a>
+        <a href="tax_calculator.html">Tax Calculator</a>
+        <a href="emi_calculator.html">EMI Calculator</a>
+        <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="tax_tips.html" class="active">Tax Saving Tips</a>
+        <a href="profile.html">Profile</a>
+        <a href="settings.html">Settings</a>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>Tax Saving Tips</h1>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div class="content">
+
+            <h2>Get Personalised Tax Advice</h2>
+            <p style="margin-bottom: 24px; color: #555;">Let Jenie's AI engine analyse your profile and suggest the best
+                actionable tips to save tax this year.</p>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <form id="taxTipsForm" class="tips-form">
+
+                <div class="form-section-label">Basic Information</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="salaryInput">Annual Income (₹)</label>
+                        <input type="text" inputmode="numeric" id="salaryInput" placeholder="e.g. 800000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ageInput">Age</label>
+                        <input type="number" id="ageInput" placeholder="e.g. 30" required min="18" max="100">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employmentType">Employment Type</label>
+                        <select id="employmentType">
+                            <option value="salaried">Salaried Employee</option>
+                            <option value="self-employed">Self-Employed / Freelancer</option>
+                            <option value="business">Business Owner</option>
+                            <option value="retired">Retired</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taxRegime">Tax Regime Preference</label>
+                        <select id="taxRegime">
+                            <option value="unsure">Not Sure (Advise Me)</option>
+                            <option value="old">Old Tax Regime</option>
+                            <option value="new">New Tax Regime</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section-label">Current Investments &amp; Deductions</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sec80c">Section 80C Investments (₹) <span class="hint">Max ₹1,50,000</span></label>
+                        <input type="text" inputmode="numeric" id="sec80c" placeholder="e.g. 50000">
+                    </div>
+                    <div class="form-group">
+                        <label for="healthInsurance">Health Insurance Premium (₹)</label>
+                        <input type="text" inputmode="numeric" id="healthInsurance" placeholder="e.g. 12000">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="homeLoan">Home Loan</label>
+                        <select id="homeLoan">
+                            <option value="none">No Home Loan</option>
+                            <option value="self-occupied">Self-Occupied Property</option>
+                            <option value="let-out">Let-Out / Rented Property</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="npsContrib">NPS Contribution (₹)</label>
+                        <input type="text" inputmode="numeric" id="npsContrib" placeholder="e.g. 50000">
+                    </div>
+                </div>
+
+                <div class="form-section-label">Financial Goals <span class="hint">(Select all that apply)</span></div>
+                <div class="checkbox-group" id="financialGoals">
+                    <label class="checkbox-label"><input type="checkbox" value="retire_early"> Retire Early</label>
+                    <label class="checkbox-label"><input type="checkbox" value="buy_house"> Buy a House</label>
+                    <label class="checkbox-label"><input type="checkbox" value="child_education"> Child's
+                        Education</label>
+                    <label class="checkbox-label"><input type="checkbox" value="wealth_creation"> Wealth
+                        Creation</label>
+                    <label class="checkbox-label"><input type="checkbox" value="tax_minimization"> Minimize Tax</label>
+                    <label class="checkbox-label"><input type="checkbox" value="emergency_fund"> Emergency Fund</label>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-btn">Get AI Tax Tips</button>
+            </form>
+
+            <div class="results-box" id="resultsBox">
+                <h3>
+                    Your Personalised AI Tax Tips
+                    <span class="results-subtitle" id="resultsSubtitle"></span>
+                </h3>
+                <div class="tips-content" id="tipsContent"></div>
+                <button class="regenerate-btn" id="regenerateBtn" onclick="regenerateTips()"
+                    style="display:none;">&#8635; Regenerate Tips</button>
+            </div>
+
+        </div>
+
+        <footer style="text-align: center; margin-top: auto; padding: 10px; font-size: 13px; color: #888;">
+            &copy; 2026 Jenie. All rights reserved. &nbsp;|&nbsp; AI tips are advisory only — consult a certified CA.
+        </footer>
+    </div>
+
+    <script type="module" src="../backend/tax_tips.js"></script>
+    <script type="module" src="../backend/tax_chat.js"></script>
+
+
+    <button id="chatbotToggleBtn" class="chatbot-fab" onclick="toggleChatbot()">
+        💬
+    </button>
+
+
+    <div id="chatbotWindow" class="chatbot-window">
+        <div class="chatbot-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0; font-size: 15px;">Jenie AI Assistant</h3>
+            </div>
+            <button class="close-btn" onclick="toggleChatbot()">&times;</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot">Hi! I'm Jenie. How can I help you with your taxes today?</div>
+        </div>
+
+        <div class="chat-chips" id="chatChips">
+            <button class="chip" onclick="sendChip('What is 80C?')">80C?</button>
+            <button class="chip" onclick="sendChip('What is 80D?')">80D?</button>
+            <button class="chip" onclick="sendChip('Old vs New Regime?')">Old vs New?</button>
+            <button class="chip" onclick="sendChip('Home Loan Interest?')">Home Loan?</button>
+        </div>
+
+        <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Ask me anything..."
+                onkeydown="if(event.key==='Enter') sendChat()">
+            <button id="chatSendBtn" onclick="sendChat()">Send</button>
+        </div>
+    </div>
+</body>
+
+</html>

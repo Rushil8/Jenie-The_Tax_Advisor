@@ -5,22 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jenie | Settings</title>
     <link rel="stylesheet" href="dashboard.css?v=2">
+    <script src="../backend/theme.js"></script>
     <style>
         .settings-card {
-            background: #fff;
+            background: var(--bg-card);
             padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             margin-bottom: 20px;
             width: 100%;
             max-width: 600px;
-            border: 1px solid #eee;
+            border: 1px solid var(--border-color);
         }
         .settings-card h2 {
             margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
-            color: #1a4bbd;
+            color: var(--text-primary);
         }
         .setting-group {
             display: flex;
@@ -30,7 +31,7 @@
             font-size: 15px;
         }
         .setting-group label {
-            color: #333;
+            color: var(--text-secondary);
             font-weight: bold;
         }
         .action-btn {
@@ -69,18 +70,19 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
+    
     <div class="sidebar">
         <h2>Jenie</h2>
         <a href="dashboard.html">Home</a>
         <a href="tax_calculator.html">Tax Calculator</a>
         <a href="emi_calculator.html">EMI Calculator</a>
         <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="tax_tips.html">Tax Saving Tips</a>
         <a href="profile.html">Profile</a>
         <a href="settings.html" class="active">Settings</a>
     </div>
 
-    <!-- Main area -->
+    
     <div class="main">
         <div class="topbar">
             <h1>Settings</h1>
@@ -97,8 +99,8 @@
                 </div>
 
                 <div class="setting-group">
-                    <label>Dark Mode (Preview)</label>
-                    <div class="toggle-switch" onclick="alert('Dark mode coming soon!')"></div>
+                    <label>Dark Mode</label>
+                    <div id="themeToggle" class="toggle-switch" onclick="toggleTheme()"></div>
                 </div>
             </div>
 
@@ -107,7 +109,7 @@
                 
                 <div class="setting-group">
                     <label>Change Password</label>
-                    <button class="action-btn" onclick="alert('Password reset link sent to your email!')">Reset Password</button>
+                    <button class="action-btn" onclick="resetPassword()">Reset Password</button>
                 </div>
 
                 <div class="setting-group">
@@ -122,21 +124,6 @@
         </footer>
     </div>
 
-    <script>
-        function logout() {
-            localStorage.removeItem("loggedInUser");
-            window.location.href = "login.html";
-        }
-        function clearData() {
-            if(confirm("Are you sure you want to clear your local data? This will log you out.")) {
-                let user = localStorage.getItem("loggedInUser");
-                if (user) {
-                    localStorage.removeItem(user);
-                }
-                localStorage.removeItem("loggedInUser");
-                window.location.href = "login.html";
-            }
-        }
-    </script>
+    <script type="module" src="../backend/settings.js"></script>
 </body>
 </html>

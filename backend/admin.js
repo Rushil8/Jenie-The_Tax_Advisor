@@ -1,208 +1,240 @@
-let slabForm = document.getElementById("slabForm");
-let slabBody = document.getElementById("slabBody");
-let emptyMsg = document.getElementById("emptyMsg");
-let clearBtn = document.getElementById("clearBtn");
-let submitBtn = document.getElementById("submitBtn");
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { 
+    collection, addDoc, getDocs, deleteDoc, doc, updateDoc, 
+    query, orderBy, setDoc, onSnapshot 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+let slabForm    = document.getElementById("slabForm");
+let slabBody    = document.getElementById("slabBody");
+let emptyMsg    = document.getElementById("emptyMsg");
+let clearBtn    = document.getElementById("clearBtn");
+let submitBtn   = document.getElementById("submitBtn");
 let cancelEditBtn = document.getElementById("cancelEditBtn");
 
-let userBody = document.getElementById("userBody");
+let userBody     = document.getElementById("userBody");
 let emptyUserMsg = document.getElementById("emptyUserMsg");
 
-let editIndex = -1;
+let editId = null;
 
-// Global variables
-let allGlobalSlabs = [];
-const API_BASE = window.location.hostname.includes("127.0.0.1") || window.location.hostname.includes("localhost")
-    ? "http://127.0.0.1:5000"
-    : "https://your-online-app.onrender.com";
-
-async function fetchFromGlobal() {
-    try {
-        let res = await fetch(API_BASE + "/api/slabs");
-        let data = await res.json();
-        
-        allGlobalSlabs = data.slabs.map((s, index) => ({
-            id: index + 1,
-            year: s.year,
-            regime: s.regime,
-            category: s.category,
-            minIncome: s.min_income,
-            maxIncome: s.max_income == null ? "No Limit" : s.max_income,
-            taxRate: s.tax_rate
-        }));
-        
-        renderAdminSlabs();
-    } catch (err) {
-        console.error("Server unavailable. Fallback to local.", err);
-        allGlobalSlabs = JSON.parse(localStorage.getItem("taxSlabs")) || [];
-        renderAdminSlabs();
+// --- Admin Presence Check ---
+onAuthStateChanged(auth, (user) => {
+    // In a real app, check user role in Firestore too
+    if (!user) {
+        // Only allow if hardcoded admin session exists or go to login
+        // For this demo, we'll assume if they're here they should be admin
+        // But let's check for basic auth
+        // window.location.href = "login.html";
     }
-}
+});
 
-async function syncToGlobal() {
-    try {
-        await fetch(API_BASE + "/api/slabs/sync", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ slabs: allGlobalSlabs })
+// --- Tax Slab Functions ---
+
+async function loadSlabs() {
+    const q = query(collection(db, "taxSlabs"), orderBy("year", "asc"));
+    
+    onSnapshot(q, (snapshot) => {
+        let slabs = [];
+        snapshot.forEach((doc) => {
+            slabs.push({ id: doc.id, ...doc.data() });
         });
-        localStorage.setItem("taxSlabs", JSON.stringify(allGlobalSlabs)); // Fallback UI caching
-    } catch(err) {
-        console.error(err);
-    }
+        renderAdminSlabs(slabs);
+    });
 }
 
-fetchFromGlobal(); // Initialize admin table
-loadUsers();
-
-slabForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    let year = document.getElementById("year").value;
-    let regime = document.getElementById("regime").value;
-    let category = document.getElementById("category").value;
-    let minIncome = document.getElementById("minIncome").value;
-    let maxIncome = document.getElementById("maxIncome").value;
-    let taxRate = document.getElementById("taxRate").value;
-
-    if (editIndex === -1) {
-        let newSlab = {
-            id: allGlobalSlabs.length + 1,
-            year: year,
-            regime: regime,
-            category: category,
-            minIncome: minIncome,
-            maxIncome: maxIncome == 0 ? "No Limit" : maxIncome,
-            taxRate: taxRate
-        };
-        allGlobalSlabs.push(newSlab);
-        alert("Tax slab saved globally!");
-    } else {
-        allGlobalSlabs[editIndex].year = year;
-        allGlobalSlabs[editIndex].regime = regime;
-        allGlobalSlabs[editIndex].category = category;
-        allGlobalSlabs[editIndex].minIncome = minIncome;
-        allGlobalSlabs[editIndex].maxIncome = maxIncome == 0 ? "No Limit" : maxIncome;
-        allGlobalSlabs[editIndex].taxRate = taxRate;
-        alert("Tax slab updated globally!");
-        editIndex = -1;
-        submitBtn.textContent = "Add Slab";
-        cancelEditBtn.style.display = "none";
-    }
-
-    await syncToGlobal();
-    slabForm.reset();
-    renderAdminSlabs();
-});
-
-cancelEditBtn.addEventListener("click", function () {
-    editIndex = -1;
-    submitBtn.textContent = "Add Slab";
-    cancelEditBtn.style.display = "none";
-    slabForm.reset();
-});
-
-function renderAdminSlabs() {
+function renderAdminSlabs(slabs) {
     slabBody.innerHTML = "";
-    if (allGlobalSlabs.length === 0) {
+    if (slabs.length === 0) {
         emptyMsg.style.display = "block";
         return;
     }
     emptyMsg.style.display = "none";
 
-    allGlobalSlabs.forEach(function (slab, index) {
-        let catDisplay = slab.category || "Normal";
-        let regDisplay = slab.regime || "Old";
+    slabs.forEach((slab, index) => {
         let row = document.createElement("tr");
-        row.innerHTML =
-            "<td>" + (index + 1) + "</td>" +
-            "<td>" + slab.year + "</td>" +
-            "<td>" + regDisplay + "</td>" +
-            "<td>" + catDisplay + "</td>" +
-            "<td>₹" + slab.minIncome + "</td>" +
-            "<td>" + (slab.maxIncome === "No Limit" ? "No Limit" : "₹" + slab.maxIncome) + "</td>" +
-            "<td>" + slab.taxRate + "%</td>" +
-            "<td>" +
-            "<button class='edit-btn' onclick='editSlab(" + index + ")'>Edit</button>" +
-            "<button class='delete-btn' onclick='deleteSlab(" + index + ")'>Delete</button>" +
-            "</td>";
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${slab.year}</td>
+            <td>${slab.regime || "Old"}</td>
+            <td>${slab.category || "Normal"}</td>
+            <td>₹${slab.minIncome}</td>
+            <td>${slab.maxIncome === "No Limit" ? "No Limit" : "₹" + slab.maxIncome}</td>
+            <td>${slab.taxRate}%</td>
+            <td>
+                <button class='edit-btn' data-id='${slab.id}'>Edit</button>
+                <button class='delete-btn' data-id='${slab.id}'>Delete</button>
+            </td>`;
         slabBody.appendChild(row);
+    });
+
+    // Attach event listeners
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => editSlab(btn.getAttribute('data-id'), slabs));
+    });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteSlab(btn.getAttribute('data-id')));
     });
 }
 
-function editSlab(index) {
-    let slab = allGlobalSlabs[index];
+slabForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    document.getElementById("year").value = slab.year;
-    document.getElementById("regime").value = slab.regime || "Old";
+    let yearVal      = document.getElementById("year").value;
+    let regime    = document.getElementById("regime").value;
+    let category  = document.getElementById("category").value;
+    let minIncome = document.getElementById("minIncome").value;
+    let maxIncome = document.getElementById("maxIncome").value;
+    let taxRate   = document.getElementById("taxRate").value;
+
+    if (!yearVal) {
+        alert("Please enter a year.");
+        return;
+    }
+
+    let slabData = {
+        year: parseInt(yearVal), 
+        regime, 
+        category,
+        minIncome: parseFloat(minIncome) || 0,
+        maxIncome: (maxIncome == 0 || maxIncome === "") ? "No Limit" : parseFloat(maxIncome),
+        taxRate: parseFloat(taxRate) || 0,
+        updatedAt: new Date().toISOString()
+    };
+
+    try {
+        if (!editId) {
+            await addDoc(collection(db, "taxSlabs"), slabData);
+            alert("✅ Tax slab added successfully!");
+        } else {
+            await updateDoc(doc(db, "taxSlabs", editId), slabData);
+            alert("✅ Tax slab updated!");
+            editId = null;
+            submitBtn.textContent = "Add Slab";
+            cancelEditBtn.style.display = "none";
+        }
+        slabForm.reset();
+    } catch (err) {
+        console.error("Firestore Error Details:", err);
+        if (err.code === 'permission-denied') {
+            alert("❌ Permission Denied: Your Firebase Rules might be blocking the save.");
+        } else {
+            alert("❌ Failed to save slab: " + err.message);
+        }
+    }
+});
+
+function editSlab(id, slabs) {
+    const slab = slabs.find(s => s.id === id);
+    if (!slab) return;
+
+    document.getElementById("year").value     = slab.year;
+    document.getElementById("regime").value   = slab.regime || "Old";
     document.getElementById("category").value = slab.category || "Normal";
     document.getElementById("minIncome").value = slab.minIncome;
     document.getElementById("maxIncome").value = slab.maxIncome === "No Limit" ? 0 : slab.maxIncome;
-    document.getElementById("taxRate").value = slab.taxRate;
+    document.getElementById("taxRate").value  = slab.taxRate;
 
-    editIndex = index;
+    editId = id;
     submitBtn.textContent = "Update Slab";
     cancelEditBtn.style.display = "inline-block";
 }
 
-async function deleteSlab(index) {
-    allGlobalSlabs.splice(index, 1);
-    await syncToGlobal();
-    renderAdminSlabs();
-}
-
-clearBtn.addEventListener("click", async function () {
-    if (confirm("Are you sure you want to delete ALL global tax slabs?")) {
-        allGlobalSlabs = [];
-        await syncToGlobal();
-        renderAdminSlabs();
-    }
-});
-
-function loadUsers() {
-    userBody.innerHTML = "";
-    let users = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        let key = localStorage.key(i);
-        if (key === "taxSlabs" || key === "loggedInUser" || key.endsWith("_taxHistory")) continue;
-
+async function deleteSlab(id) {
+    if (confirm("Delete this slab?")) {
         try {
-            let data = JSON.parse(localStorage.getItem(key));
-            if (data && data.username && data.password) {
-                users.push(data);
-            }
-        } catch (e) {
-            // Not a user JSON
+            await deleteDoc(doc(db, "taxSlabs", id));
+        } catch (err) {
+            console.error("Delete Error:", err);
         }
     }
+}
 
+async function clearSlabs() {
+    if (confirm("Are you sure you want to delete ALL tax slabs from Cloud Firestore?")) {
+        try {
+            const querySnapshot = await getDocs(collection(db, "taxSlabs"));
+            const deletePromises = [];
+            querySnapshot.forEach((document) => {
+                deletePromises.push(deleteDoc(doc(db, "taxSlabs", document.id)));
+            });
+            await Promise.all(deletePromises);
+            alert("All slabs deleted successfully.");
+        } catch (err) {
+            console.error("Clear Error:", err);
+            alert("Failed to clear slabs.");
+        }
+    }
+}
+
+clearBtn.addEventListener("click", clearSlabs);
+
+// --- User Management Functions ---
+
+async function loadUsers() {
+    const q = query(collection(db, "users"), orderBy("name", "asc"));
+    
+    onSnapshot(q, (snapshot) => {
+        let users = [];
+        snapshot.forEach((doc) => {
+            users.push({ id: doc.id, ...doc.data() });
+        });
+        renderUsers(users);
+    });
+}
+
+function renderUsers(users) {
+    userBody.innerHTML = "";
     if (users.length === 0) {
         emptyUserMsg.style.display = "block";
         return;
     }
     emptyUserMsg.style.display = "none";
 
-    users.forEach(function (user, index) {
+    users.forEach((user, index) => {
         let row = document.createElement("tr");
-        row.innerHTML =
-            "<td>" + (index + 1) + "</td>" +
-            "<td>" + user.name + "</td>" +
-            "<td>" + user.username + "</td>" +
-            "<td>" + user.email + "</td>" +
-            "<td>" + user.phone + "</td>" +
-            "<td><button class='delete-btn' onclick='deleteUser(\"" + user.username + "\")'>Delete</button></td>";
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${user.name}</td>
+            <td>${user.username}</td>
+            <td>${user.email}</td>
+            <td>${user.phone}</td>
+            <td><button class='delete-btn' data-id='${user.id}'>Delete</button></td>`;
         userBody.appendChild(row);
+    });
+
+    document.querySelectorAll('#userTable .delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteUser(btn.getAttribute('data-id')));
     });
 }
 
-function deleteUser(username) {
-    if (confirm("Are you sure you want to delete user '" + username + "'?")) {
-        localStorage.removeItem(username);
-        localStorage.removeItem(username + "_taxHistory");
-        loadUsers();
+async function deleteUser(id) {
+    if (confirm("Delete this user profile from Firestore? (Auth entry must be deleted manually in console)")) {
+        await deleteDoc(doc(db, "users", id));
     }
 }
 
-function logout() {
-    window.location.href = "login.html";
-}
+// Global functions for HTML onclick
+window.logout = async () => {
+    try {
+        await signOut(auth);
+        window.location.href = "index.html";
+    } catch (error) {
+        console.error("Logout Error:", error);
+        window.location.href = "index.html";
+    }
+};
+
+window.cancelEdit = () => {
+    editId = null;
+    slabForm.reset();
+    submitBtn.textContent = "Add Slab";
+    cancelEditBtn.style.display = "none";
+};
+
+cancelEditBtn.addEventListener("click", window.cancelEdit);
+
+// Init directly (ES modules run after parsing anyway)
+loadSlabs();
+loadUsers();
+
+// DEBUG_MARKER_FOR_UPDATE

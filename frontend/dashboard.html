@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jenie | Dashboard</title>
     <link rel="stylesheet" href="dashboard.css?v=2">
+    <script src="../backend/theme.js"></script>
 </head>
 
 <body>
@@ -16,6 +17,7 @@
         <a href="tax_calculator.html">Tax Calculator</a>
         <a href="emi_calculator.html">EMI Calculator</a>
         <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="tax_tips.html">Tax Saving Tips</a>
         <a href="profile.html">Profile</a>
         <a href="settings.html">Settings</a>
     </div>
@@ -43,7 +45,39 @@
         </footer>
     </div>
 
-    <script src="../backend/dashboard.js"></script>
+    <script type="module" src="../backend/dashboard.js"></script>
+    <script type="module" src="../backend/tax_chat.js"></script>
+
+    
+    <button id="chatbotToggleBtn" class="chatbot-fab" onclick="toggleChatbot()">
+        💬
+    </button>
+
+    
+    <div id="chatbotWindow" class="chatbot-window">
+        <div class="chatbot-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0; font-size: 15px;">Jenie AI Assistant</h3>
+            </div>
+            <button class="close-btn" onclick="toggleChatbot()">&times;</button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot">Hi! I'm Jenie. How can I help you today?</div>
+        </div>
+
+        <div class="chat-chips" id="chatChips">
+            <button class="chip" onclick="sendChip('What is 80C?')">80C?</button>
+            <button class="chip" onclick="sendChip('What is 80D?')">80D?</button>
+            <button class="chip" onclick="sendChip('Old vs New Regime?')">Old vs New?</button>
+            <button class="chip" onclick="sendChip('Home Loan Interest?')">Home Loan?</button>
+        </div>
+
+        <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendChat()">
+            <button id="chatSendBtn" onclick="sendChat()">Send</button>
+        </div>
+    </div>
 </body>
 
 </html>

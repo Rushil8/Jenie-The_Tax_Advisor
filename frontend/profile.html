@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jenie | Profile</title>
+    <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="profile.css">
+    <script src="../backend/theme.js"></script>
 </head>
 
 <body>
@@ -17,6 +19,7 @@
         <a href="tax_calculator.html">Tax Calculator</a>
         <a href="emi_calculator.html">EMI Calculator</a>
         <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="tax_tips.html">Tax Saving Tips</a>
         <a href="profile.html" class="active">Profile</a>
         <a href="settings.html">Settings</a>
     </div>
@@ -35,15 +38,19 @@
             <div class="profile-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <h2>User Information</h2>
-                    <button id="editBtn" onclick="toggleEdit()" style="padding: 6px 12px; background: #1a4bbd; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit Profile</button>
-                    <button id="saveBtn" onclick="saveProfile()" style="display: none; padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+                    <button id="editBtn" onclick="toggleEdit()"
+                        style="padding: 6px 12px; background: #1a4bbd; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit
+                        Profile</button>
+                    <button id="saveBtn" onclick="saveProfile()"
+                        style="display: none; padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
                 </div>
                 <hr>
 
                 <div class="info-group">
                     <label>Full Name</label>
                     <p id="profileName">Loading...</p>
-                    <input type="text" id="editName" style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
+                    <input type="text" id="editName"
+                        style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
                 </div>
 
                 <div class="info-group">
@@ -52,15 +59,22 @@
                 </div>
 
                 <div class="info-group">
+                    <label>Account Type</label>
+                    <p id="profileRole">Loading...</p>
+                </div>
+
+                <div class="info-group">
                     <label>Email Address</label>
                     <p id="profileEmail">Loading...</p>
-                    <input type="email" id="editEmail" style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
+                    <input type="email" id="editEmail"
+                        style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
                 </div>
 
                 <div class="info-group">
                     <label>Phone Number</label>
                     <p id="profilePhone">Loading...</p>
-                    <input type="text" id="editPhone" style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
+                    <input type="text" id="editPhone"
+                        style="display:none; padding: 6px; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px;">
                 </div>
 
             </div>
@@ -72,7 +86,8 @@
                     <p id="noHistoryMsg" style="color: #666; font-size: 14px;">No calculations found yet.</p>
                     <table id="historyTable"
                         style="display:none; width: 100%; border-collapse: collapse; font-size: 14px;">
-                        <thead style="background-color: #f0f0f0; border-bottom: 2px solid #ddd;">
+                        <thead
+                            style="background-color: var(--bg-page); border-bottom: 2px solid var(--border-color); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease;">
                             <tr>
                                 <th style="padding: 10px; text-align: left;">Date</th>
                                 <th style="padding: 10px; text-align: left;">Year</th>
@@ -92,7 +107,7 @@
         </footer>
     </div>
 
-    <script src="../backend/profile.js"></script>
+    <script type="module" src="../backend/profile.js"></script>
 </body>
 
 </html>

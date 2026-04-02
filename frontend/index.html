@@ -1,97 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jenie - Your Personal Tax Assistant</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css">
-    <!-- Using standard, clear system fonts in CSS -->
 </head>
+
 <body>
 
-    <!-- Navigation Header -->
+
     <header class="navbar">
         <div class="nav-container">
-            <div class="logo">Jenie</div>
-            <nav class="nav-links">
-                <a href="#about">What We Do</a>
-                <a href="#contact">Contact</a>
-            </nav>
+            <div class="logo">
+                <span class="logo-icon">Jenie</span>
+            </div>
+
             <div class="auth-buttons">
-                <a href="login.html" class="btn btn-login">Login</a>
-                <a href="register.html" class="btn btn-register">Create Account</a>
+                <a href="login.html" class="btn btn-secondary">Login</a>
+                <a href="register.html" class="btn btn-primary">Create Account</a>
             </div>
         </div>
     </header>
 
-    <!-- Main Hero Banner (Text Only, Informative) -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Stress-free tax preparation and financial management.</h1>
-            <p class="subtitle">
-                Jenie is a straightforward platform designed to help you calculate your income taxes, uncover valuable deductions, and stay updated with tax news. Perfect for individuals and small businesses.
-            </p>
-            <div class="hero-actions">
-                <a href="register.html" class="btn btn-register btn-large">Get Started Now</a>
-                <a href="login.html" class="btn btn-login btn-large">Log into Existing Account</a>
-            </div>
-        </div>
-    </section>
 
-    <!-- Informative Section: What the Platform Does -->
-    <section id="about" class="info-section">
-        <div class="info-container">
-            <h2>What Does Jenie Do?</h2>
-            <p class="section-desc">Our platform offers a complete suite of tools to take the complexity out of your taxes.</p>
-            
-            <div class="feature-list">
-                <!-- Feature 1 -->
-                <div class="feature-item">
-                    <div class="feature-text">
-                        <h3>1. Automated Tax Calculation</h3>
-                        <p>Simply enter your income streams. Jenie breaks down the exact amounts you owe or are owed according to the current tax brackets, providing completely transparent calculations.</p>
-                    </div>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="feature-item">
-                    <div class="feature-text">
-                        <h3>2. Smart Deduction Tracking</h3>
-                        <p>Track your business and personal expenses. Jenie automatically highlights which expenses qualify as tax deductions to ensure you save as much money as legally possible.</p>
-                    </div>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="feature-item">
-                    <div class="feature-text">
-                        <h3>3. Currency Exchange Tool</h3>
-                        <p>Working or spending internationally? Utilize our integrated currency exchange calculator to accurately report and balance foreign income and overseas expenses on your return.</p>
-                    </div>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="feature-item">
-                    <div class="feature-text">
-                        <h3>4. Daily Tax News & Alerts</h3>
-                        <p>Tax rules change regularly. Our dashboard includes a live news feed offering the latest financial updates so you never miss a deadline or a new legislative benefit.</p>
-                    </div>
+    <section class="hero text-center">
+        <div class="hero-container">
+            <div class="hero-text">
+                <h1>Stress-free tax preparation and planning.</h1>
+                <p class="subtitle">
+                    Jenie helps you calculate your income taxes accurately, uncover valuable deductions, and get
+                    real-time answers from our built-in AI tax assistant.
+                </p>
+                <div class="hero-actions center-actions">
+                    <a href="register.html" class="btn btn-primary btn-large">Create Account</a>
+                    <a href="login.html" class="btn btn-secondary btn-large">Login</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Simple Call To Action Footer -->
+
+    <section id="features" class="features-section">
+        <div class="section-header">
+            <h2>Everything you need for your taxes</h2>
+            <p>A complete suite of tools designed to simplify Indian taxation.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Intelligent Tax Calculator</h3>
+                <p>Compare Old and New Tax Regimes instantly. See a detailed breakdown of your tax slabs and choose the
+                    most beneficial regime.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Deduction Tracking</h3>
+                <p>Track your Section 80C, 80D, Health Insurance, and Home Loan deductions to ensure you save as much as
+                    legally possible.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Currency Exchange</h3>
+                <p>Working internationally? Convert foreign income and overseas expenses into INR easily with our
+                    built-in exchange tool.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Live Tax News</h3>
+                <p>Stay informed with a live news feed offering the latest financial updates, tax deadlines, and new
+                    legislative benefits.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="ai-assistant" class="ai-section text-center">
+        <div class="ai-container">
+            <div class="ai-text">
+                <h2>Meet the Jenie AI Assistant</h2>
+                <p>Tax codes can be confusing. That's why Jenie includes a conversational AI trained on the latest
+                    Indian tax rules.</p>
+                <ul class="ai-benefits inline-benefits">
+                    <li><span class="check">■</span> Real-time answers to your tax queries</li>
+                    <li><span class="check">■</span> Clarification on complex deductions (80C, 80D, NPS)</li>
+                    <li><span class="check">■</span> Secure, conversational, and easy to use</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+
     <section class="cta-banner">
-        <h2>Ready to simplify your taxes?</h2>
-        <a href="register.html" class="btn btn-register btn-large" style="margin-top: 20px;">Create Your Free Account</a>
+        <div class="cta-content">
+            <h2>Ready to take control of your taxes?</h2>
+            <a href="register.html" class="btn btn-light btn-large mt-4">Create Your Free Account</a>
+        </div>
     </section>
 
-    <!-- Footer -->
+
     <footer class="site-footer">
         <div class="footer-bottom">
+            <div class="logo">Jenie</div>
             <p>&copy; 2026 Jenie. All rights reserved.</p>
         </div>
     </footer>
 
 </body>
+
 </html>

@@ -5,27 +5,13 @@ let swapBtn = document.getElementById("swapBtn");
 let rateText = document.getElementById("conversionRate");
 let resultText = document.getElementById("conversionResult");
 
-import { auth } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = "login.html";
-    }
-});
-
-window.logout = async () => {
-    try {
-        await signOut(auth);
-        window.location.href = "index.html";
-    } catch (error) {
-        console.error("Logout Error:", error);
-    }
-};
+let username = localStorage.getItem("loggedInUser");
+if (!username) {
+    window.location.href = "login.html";
+}
 
 async function calculateExchange() {
-    let valStr = amountInput.value.replace(/,/g, '');
-    let amount = parseFloat(valStr) || 0;
+    let amount = parseFloat(amountInput.value) || 0;
     let from = fromSelect.value;
     let to = toSelect.value;
 
@@ -70,20 +56,13 @@ swapBtn.addEventListener("click", function () {
     calculateExchange();
 });
 
-amountInput.addEventListener("input", function(e) {
-    let val = this.value.replace(/[^0-9.]/g, '');
-    if (val !== "") {
-        let parts = val.split('.');
-        if (parts[0]) parts[0] = parseInt(parts[0], 10).toLocaleString('en-IN');
-        if (parts.length > 2) parts = [parts[0], parts.slice(1).join('')]; // Handle multiple dots
-        this.value = parts.join('.');
-    } else {
-        this.value = '';
-    }
-    calculateExchange();
-});
+amountInput.addEventListener("input", calculateExchange);
 fromSelect.addEventListener("change", calculateExchange);
 toSelect.addEventListener("change", calculateExchange);
 
 calculateExchange();
 
+function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+}

@@ -7,6 +7,7 @@
     <title>Jenie | EMI Calculator</title>
     <link rel="stylesheet" href="dashboard.css?v=2">
     <link rel="stylesheet" href="emi_calculator.css">
+    <script src="../backend/theme.js"></script>
 </head>
 
 <body>
@@ -17,6 +18,7 @@
         <a href="tax_calculator.html">Tax Calculator</a>
         <a href="emi_calculator.html" class="active">EMI Calculator</a>
         <a href="currency_exchange.html">Currency Exchange</a>
+        <a href="tax_tips.html">Tax Saving Tips</a>
         <a href="profile.html">Profile</a>
         <a href="settings.html">Settings</a>
     </div>
@@ -28,34 +30,172 @@
         </div>
 
         <div class="content emi-content">
-            <div class="calc-container">
-                <h2>Calculate Your Loan EMI</h2>
+
+            <div class="calc-container" id="step1">
+                <h2>Step 1 — Your Loan Profile</h2>
+                <p class="step-desc">Fill in your details to get a personalized interest rate estimate before
+                    calculating EMI.</p>
+
+                <form id="profileForm">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="loanType">Loan Type</label>
+                            <select id="loanType" required>
+                                <option value="">— Select Loan Type —</option>
+                                <option value="home">Home Loan</option>
+                                <option value="car">Car / Auto Loan</option>
+                                <option value="personal">Personal Loan</option>
+                                <option value="education">Education Loan</option>
+                                <option value="gold">Gold Loan</option>
+                                <option value="business">Business Loan</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="employmentType">Employment Type</label>
+                            <select id="employmentType" required>
+                                <option value="">— Select —</option>
+                                <option value="salaried_govt">Salaried – Government</option>
+                                <option value="salaried_pvt">Salaried – Private</option>
+                                <option value="self_employed">Self-Employed / Business</option>
+                                <option value="freelancer">Freelancer / Consultant</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="monthlySalary">Monthly Salary (₹)</label>
+                            <input type="text" id="monthlySalary" inputmode="numeric" placeholder="e.g. 50000" required
+                                min="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="existingEmi">Existing EMIs (₹) <span class="hint">Or 0</span></label>
+                            <input type="text" id="existingEmi" inputmode="numeric" placeholder="e.g. 5000" value="0"
+                                min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="creditScore">CIBIL / Credit Score</label>
+                            <select id="creditScore" required>
+                                <option value="">— Select Score —</option>
+                                <option value="excellent">750 – 900 (Excellent)</option>
+                                <option value="good">700 – 749 (Good)</option>
+                                <option value="fair">650 – 699 (Fair)</option>
+                                <option value="poor">Below 650 (Poor)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="loanAmount">Loan Amount Required (₹)</label>
+                            <input type="text" inputmode="numeric" id="loanAmount" placeholder="e.g. 500000" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tenure">Desired Loan Tenure</label>
+                            <div style="display: flex; gap: 5px;">
+                                <input type="number" id="tenure" placeholder="e.g. 60" required min="1" style="flex: 2;">
+                                <select id="tenureUnit" style="flex: 1; min-width: 90px;">
+                                    <option value="months">Months</option>
+                                    <option value="years">Years</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="visibility: hidden;"></div>
+                    </div>
+                    
+                    <button type="submit" class="calc-btn" style="margin-top: 10px; width: 100%;">Check Eligibility & Get Rate →</button>
+                </form>
+
+                <div id="eligibilityResult" style="display:none;" class="eligibility-box">
+                    <h3 id="eligibilityTitle"></h3>
+                    <div id="eligibilityDetails"></div>
+                    <button class="calc-btn" id="proceedBtn" style="margin-top:20px; display:none;"
+                        onclick="proceedToEMI()">
+                        Calculate EMI with This Rate →
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── STEP 2: EMI Calculation ──────────────────────────────── -->
+            <div class="calc-container" id="step2" style="display:none;">
+                <h2>Step 2 — Calculate Your EMI</h2>
+                <p class="step-desc">We've pre-filled your suggested rate. You can adjust it if needed.</p>
+
                 <form id="emiForm">
-                    <div class="form-group">
-                        <label for="principal">Loan Amount (Principal):</label>
-                        <input type="number" id="principal" name="principal" placeholder="e.g. 100000" required min="1">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="principal">Loan Amount (₹)</label>
+                            <input type="text" inputmode="numeric" id="principal" placeholder="e.g. 500000" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rate">Annual Interest Rate (%) <span id="rateHint" class="hint-text"
+                                    style="font-weight: normal;"></span></label>
+                            <input type="number" id="rate" placeholder="e.g. 8.5" step="0.01" required min="0.1">
+                        </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="rate">Annual Interest Rate (%):</label>
-                        <input type="number" id="rate" name="rate" placeholder="e.g. 7.5" step="0.01" required min="0.1">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="months">Loan Tenure</label>
+                            <div style="display: flex; gap: 5px;">
+                                <input type="number" id="months" placeholder="e.g. 60" required min="1" style="flex: 2;">
+                                <select id="monthsUnit" style="flex: 1; min-width: 90px;">
+                                    <option value="months" selected>Months</option>
+                                    <option value="years">Years</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="visibility: hidden;"></div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="months">Loan Tenure (in months):</label>
-                        <input type="number" id="months" name="months" placeholder="e.g. 60" required min="1">
+
+                    <div style="display: flex; gap: 15px; margin-top: 10px;">
+                        <button type="button" class="reset-btn" onclick="goBack()"
+                            style="flex: 1; margin-bottom: 0;">← Back</button>
+                        <button type="submit" class="calc-btn" style="flex: 2; margin-bottom: 0;">Calculate
+                            EMI</button>
                     </div>
-                    
-                    <button type="submit" class="calc-btn">Calculate EMI</button>
-                    <button type="reset" class="reset-btn" onclick="clearResult()">Reset</button>
                 </form>
 
                 <div id="emiResult" class="result-box" style="display: none;">
-                    <h3>Your Monthly EMI: <span id="emiValue">0</span></h3>
-                    <p>Total Interest Payable: <span id="totalInterest">0</span></p>
-                    <p>Total Payment (Principal + Interest): <span id="totalPayment">0</span></p>
+                    <h3>Monthly EMI: <span id="emiValue">0</span></h3>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <span class="result-label">Principal</span>
+                            <span class="result-val" id="principalDisp">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Total Interest</span>
+                            <span class="result-val" id="totalInterest">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Total Payment</span>
+                            <span class="result-val" id="totalPayment">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Interest % of Loan</span>
+                            <span class="result-val" id="interestPct">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Simple Pie Chart (CSS) -->
+                    <div class="chart-wrap">
+                        <div class="pie-chart" id="pieChart"></div>
+                        <div class="chart-legend">
+                            <span class="legend-dot principal-dot"></span> Principal
+                            <span class="legend-dot interest-dot"></span> Interest
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
 
         <footer style="text-align: center; margin-top: auto; padding: 10px; font-size: 14px; color: #666;">
@@ -63,13 +203,7 @@
         </footer>
     </div>
 
-    <script src="../backend/emi_calculator.js"></script>
-    <script>
-        function logout() {
-            localStorage.removeItem("loggedInUser");
-            window.location.href = "login.html";
-        }
-    </script>
+    <script type="module" src="../backend/emi_calculator.js"></script>
 </body>
 
 </html>

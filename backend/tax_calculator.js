@@ -1,174 +1,261 @@
+import { auth, db } from "./firebase-config.js";
+import { collection, onSnapshot, query, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
 let taxForm = document.getElementById("taxForm");
 let yearSelect = document.getElementById("year");
 let resultBox = document.getElementById("resultBox");
-let breakdownBody = document.getElementById("breakdownBody");
-let totalTaxEl = document.getElementById("totalTax");
-let effectiveEl = document.getElementById("effectiveRate");
 let noSlabMsg = document.getElementById("noSlabMsg");
 
-let globalSlabs = [];
-const API_BASE = window.location.hostname.includes("127.0.0.1") || window.location.hostname.includes("localhost")
-    ? "http://127.0.0.1:5000"
-    : "https://your-online-app.onrender.com";
-
-async function populateYears() {
-    try {
-        let res = await fetch(API_BASE + "/api/slabs");
-        let data = await res.json();
-        
-        // Translate format mapped by Database directly into Calculator logic natively!
-        globalSlabs = data.slabs.map(s => ({
-            year: s.year,
-            regime: s.regime,
-            category: s.category,
-            minIncome: s.min_income,
-            maxIncome: s.max_income == null ? "No Limit" : s.max_income,
-            taxRate: s.tax_rate
-        }));
-    } catch(err) {
-        console.warn("Using Offline Database...", err);
-        globalSlabs = JSON.parse(localStorage.getItem("taxSlabs")) || [];
+let currentUser = null;
+onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if (!user) {
+        // window.location.href = "login.html"; // Optional: Force login?
     }
+});
 
-    let years = [];
-    globalSlabs.forEach(function (slab) {
-        if (!years.includes(slab.year)) {
-            years.push(slab.year);
-        }
+let globalSlabs = [];
+
+// --- Live Slab Loading ---
+async function loadSlabs() {
+    const q = query(collection(db, "taxSlabs"), orderBy("year", "asc"));
+    
+    // Switch to real-time snapshot
+    onSnapshot(q, (snapshot) => {
+        globalSlabs = [];
+        snapshot.forEach((doc) => {
+            globalSlabs.push({ id: doc.id, ...doc.data() });
+        });
+        populateYears();
     });
+}
 
+function populateYears() {
+    let years = [];
+    globalSlabs.forEach(slab => {
+        if (!years.includes(slab.year)) years.push(slab.year);
+    });
     years.sort();
     yearSelect.innerHTML = "";
 
     if (years.length === 0) {
         let opt = document.createElement("option");
-        opt.textContent = "No years available (Waiting for Admin)";
+        opt.textContent = "No years available (Ask admin to add slabs)";
         yearSelect.appendChild(opt);
         return;
     }
 
-    years.forEach(function (yr) {
+    years.forEach(yr => {
         let opt = document.createElement("option");
         opt.value = yr;
         opt.textContent = yr;
         yearSelect.appendChild(opt);
     });
 }
-populateYears();
 
-taxForm.addEventListener("submit", function (e) {
-    e.preventDefault();
+loadSlabs();
 
-    let selectedYear = yearSelect.value;
-    let selectedRegime = document.getElementById("regime").value;
-    let selectedCategory = document.getElementById("category").value;
-    let baseIncome = parseFloat(document.getElementById("income").value) || 0;
-    let otherIncome = parseFloat(document.getElementById("otherIncome").value) || 0;
+function calculateRegimeTax(totalIncome, regime, category, deductions, year, RentIncome) {
+    let standardDed = regime === 'New' ? 75000 : 50000;
+    let rebateLimit = regime === 'New' ? 700000 : 500000;
 
-    let inv80c = parseFloat(document.getElementById("inv80c").value) || 0;
-    let healthIns = parseFloat(document.getElementById("healthIns").value) || 0;
-    let homeLoan = parseFloat(document.getElementById("homeLoan").value) || 0;
-    let otherDeductions = parseFloat(document.getElementById("otherDeductions").value) || 0;
+    let netTaxable = Math.max(0, totalIncome - standardDed - (regime === 'Old' ? (deductions + RentIncome) : (0 + RentIncome)));
 
-    // Deductions aren't generally allowed in New Regime, so zero them out if New is selected
-    if (selectedRegime === "New") {
-        inv80c = 0; healthIns = 0; homeLoan = 0; otherDeductions = 0;
-    }
-
-    let deductions = inv80c + healthIns + homeLoan + otherDeductions;
-
-    let grossIncome = baseIncome + otherIncome;
-    let netTaxableIncome = Math.max(0, grossIncome - deductions);
-
-    // Use the fetched Global Slabs from the Database for definitive calculation!
-    let allSlabs = globalSlabs;
-
-    let slabs = allSlabs.filter(function (s) {
+    let slabs = globalSlabs.filter(s => {
         let cat = s.category || "Normal";
         let reg = s.regime || "Old";
-        return s.year == selectedYear && cat == selectedCategory && reg == selectedRegime;
+        return s.year == year && cat == category && reg == regime;
     });
 
-    slabs.sort(function (a, b) {
-        return parseFloat(a.minIncome) - parseFloat(b.minIncome);
-    });
+    slabs.sort((a, b) => parseFloat(a.minIncome) - parseFloat(b.minIncome));
 
-    if (slabs.length === 0) {
-        resultBox.style.display = "none";
-        noSlabMsg.style.display = "block";
-        return;
-    }
+    if (slabs.length === 0) return null;
 
-    noSlabMsg.style.display = "none";
-    resultBox.style.display = "block";
-    breakdownBody.innerHTML = "";
-
-    let totalTax = 0;
     let baseTax = 0;
-    let cess = 0;
+    let slabDetails = [];
 
-    let applicableSlab = slabs.find(function (slab) {
+    slabs.forEach(slab => {
         let min = parseFloat(slab.minIncome);
         let max = slab.maxIncome === "No Limit" ? Infinity : parseFloat(slab.maxIncome);
-        return netTaxableIncome >= min && netTaxableIncome <= max;
+        let rate = parseFloat(slab.taxRate) / 100;
+
+        if (netTaxable > min) {
+            let taxableInSlab = Math.min(netTaxable, max) - min;
+            let taxForSlab = taxableInSlab * rate;
+            baseTax += taxForSlab;
+
+            slabDetails.push({
+                range: `₹${min.toLocaleString('en-IN')} - ${max === Infinity ? 'No Limit' : '₹' + max.toLocaleString('en-IN')}`,
+                rate: `${slab.taxRate}%`,
+                tax: taxForSlab
+            });
+        }
     });
 
-    if (applicableSlab) {
-        let min = parseFloat(applicableSlab.minIncome);
-        let maxDisplay = applicableSlab.maxIncome === "No Limit" ? "No Limit" : "₹" + Number(applicableSlab.maxIncome).toLocaleString("en-IN");
-        let rate = parseFloat(applicableSlab.taxRate) / 100;
-
-        baseTax = netTaxableIncome * rate;
-        cess = baseTax * 0.04;
-        totalTax = baseTax + cess;
-
-        let row = document.createElement("tr");
-        row.innerHTML =
-            "<td>₹" + Number(min).toLocaleString("en-IN") + " – " + maxDisplay + "</td>" +
-            "<td>" + applicableSlab.taxRate + "%</td>" +
-            "<td>₹" + netTaxableIncome.toLocaleString("en-IN") + "</td>" +
-            "<td>₹" + baseTax.toLocaleString("en-IN") + "</td>";
-        breakdownBody.appendChild(row);
+    let appliedRebate = 0;
+    if (netTaxable <= rebateLimit) {
+        appliedRebate = baseTax;
+        baseTax = 0;
     }
 
-    let cessRow = document.createElement("tr");
-    cessRow.innerHTML =
-        "<td colspan='3'>Health & Education Cess (4%)</td>" +
-        "<td>₹" + cess.toLocaleString("en-IN") + "</td>";
-    breakdownBody.appendChild(cessRow);
+    let cess = baseTax * 0.04;
+    return {
+        totalTax: baseTax + cess,
+        baseTax,
+        cess,
+        netTaxable,
+        slabDetails,
+        appliedRebate
+    };
+}
 
-    let totalRow = document.createElement("tr");
-    totalRow.innerHTML =
-        "<td colspan='3'><strong>Total Final Tax</strong></td>" +
-        "<td><strong>₹" + totalTax.toLocaleString("en-IN") + "</strong></td>";
-    breakdownBody.appendChild(totalRow);
+if (taxForm) {
+    taxForm.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    let effective = grossIncome > 0 ? ((totalTax / grossIncome) * 100).toFixed(2) : 0;
+        let selectedYear = yearSelect.value;
 
-    totalTaxEl.innerHTML =
-        "Gross Income: ₹" + grossIncome.toLocaleString("en-IN") + "<br>" +
-        "Net Taxable Income: ₹" + netTaxableIncome.toLocaleString("en-IN") + "<br><br>" +
-        "Total Final Tax Payable: ₹" + totalTax.toLocaleString("en-IN");
+        function getNumVal(id) {
+            let el = document.getElementById(id);
+            if (!el) return 0;
+            let val = el.value.replace(/,/g, '');
+            return parseFloat(val) || 0;
+        }
 
-    effectiveEl.textContent = "Effective Tax Rate (on Gross Income): " + effective + "%";
+        let baseIncome = getNumVal("income");
+        let InterestIncome = getNumVal("InterestIncome");
+        let RentIncome = getNumVal("RentIncome");
+        let grossIncome = baseIncome + InterestIncome + RentIncome;
 
-    // Save to history
-    let username = localStorage.getItem("loggedInUser");
-    if (username) {
-        let historyKey = username + "_taxHistory";
-        let history = JSON.parse(localStorage.getItem(historyKey)) || [];
-        history.push({
-            date: new Date().toLocaleString(),
+        let category = document.getElementById("category").value;
+
+        // Deductions
+        let inv80cVal = getNumVal("inv80c");
+        let inv80c_deduction = inv80cVal < 150000 ? inv80cVal : 150000;
+
+        let intIncomeVal = getNumVal("InterestIncome");
+        let interest_deduction = intIncomeVal < 10000 ? intIncomeVal : 10000;
+
+        let rentIncomeVal = getNumVal("RentIncome");
+        let rent_deduction = 0.3 * rentIncomeVal;
+
+        let healthInsVal = getNumVal("healthIns");
+        let healthInsLimit = category === "Normal" ? 25000 : 50000;
+        let health_deduction = healthInsVal < healthInsLimit ? healthInsVal : healthInsLimit;
+
+        let NPSVal = getNumVal("NPS");
+        let NPS_deduction = NPSVal < 50000 ? NPSVal : 50000;
+
+        let other_deduction = getNumVal("otherDeductions");
+        let deductions = inv80c_deduction + interest_deduction + health_deduction + NPS_deduction + other_deduction;
+
+        // Result table renderer
+        function renderTable(result, regime) {
+            let rows = '';
+            if (result.slabDetails.length) {
+                rows += result.slabDetails.map(s => `
+                    <tr>
+                        <td>${s.range}</td>
+                        <td>${s.rate}</td>
+                        <td>₹${s.tax.toLocaleString('en-IN')}</td>
+                    </tr>
+                `).join('');
+            } else {
+                rows += '<tr><td colspan="3" style="text-align:center; color:#94a3b8; font-size:12px; padding:15px;">No taxable income after deductions.</td></tr>';
+            }
+            if (result.appliedRebate > 0) {
+                rows += `<tr style="color:#16a34a; font-weight:bold; background-color:#f0fdf4;"><td colspan="2">Sec 87A Rebate</td><td>- ₹${result.appliedRebate.toLocaleString('en-IN')}</td></tr>`;
+            }
+            rows += `<tr style="border-top:2px solid #e2e8f0; font-weight:bold; background-color:#f8fafc;"><td colspan="2">Total + Cess (4%)</td><td>₹${result.totalTax.toLocaleString('en-IN')}</td></tr>`;
+            return `<table class="breakdown-table"><thead><tr><th>Slab</th><th>Rate</th><th>Tax</th></tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        let oldResult = calculateRegimeTax(grossIncome, 'Old', category, deductions, selectedYear, rent_deduction);
+        let newResult = calculateRegimeTax(grossIncome, 'New', category, 0, selectedYear, rent_deduction);
+
+        if (!oldResult || !newResult) {
+            resultBox.style.display = "none";
+            noSlabMsg.textContent = `No slabs found for ${selectedYear}. Ensure Admin adds slabs.`;
+            noSlabMsg.style.display = "block";
+            return;
+        }
+
+        // --- Render UI ---
+        noSlabMsg.style.display = "none";
+        resultBox.style.display = "block";
+        resultBox.innerHTML = `
+            <div class="card-title">Detailed Tax Calculation (${selectedYear})</div>
+            <div class="comparison-container" style="gap: 40px;">
+                <div class="comparison-card ${oldResult.totalTax <= newResult.totalTax ? 'better' : 'worse'}">
+                    <h4 style="margin-bottom: 10px;">Old Regime</h4>
+                    <div style="font-size: 13px; color: #555;">
+                        <div>Gross Salary: ₹${grossIncome.toLocaleString('en-IN')}</div>
+                        <div style="font-weight:bold;">Net Taxable: ₹${oldResult.netTaxable.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="tax-amount" style="margin-top: 15px;">₹${oldResult.totalTax.toLocaleString('en-IN')}</div>
+                    ${renderTable(oldResult, 'Old')}
+                </div>
+                <div class="comparison-card ${newResult.totalTax < oldResult.totalTax ? 'better' : 'worse'}">
+                    <h4 style="margin-bottom: 10px;">New Regime</h4>
+                    <div style="font-size: 13px; color: #555;">
+                        <div>Gross Salary: ₹${grossIncome.toLocaleString('en-IN')}</div>
+                        <div style="font-weight:bold;">Net Taxable: ₹${newResult.netTaxable.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="tax-amount" style="margin-top: 15px;">₹${newResult.totalTax.toLocaleString('en-IN')}</div>
+                    ${renderTable(newResult, 'New')}
+                </div>
+            </div>
+            <div class="recommendation">
+                Recommendation: Choose <strong>${oldResult.totalTax <= newResult.totalTax ? 'Old Regime' : 'New Regime'}</strong> 
+                to save <strong>₹${Math.abs(oldResult.totalTax - newResult.totalTax).toLocaleString('en-IN')}</strong> per year.
+            </div>`;
+
+        // Save history
+        const record = {
+            timestamp: new Date().toISOString(),
             year: selectedYear,
-            grossIncome: grossIncome,
-            netTaxable: netTaxableIncome,
-            totalTax: totalTax
+            grossIncome,
+            netTaxable: oldResult.totalTax < newResult.totalTax ? oldResult.netTaxable : newResult.netTaxable,
+            totalTax: Math.min(oldResult.totalTax, newResult.totalTax),
+            bestRegime: oldResult.totalTax < newResult.totalTax ? 'Old' : 'New'
+        };
+
+        // 1. Save to Cloud Firestore if logged in
+        if (currentUser) {
+            try {
+                const historyRef = collection(db, "users", currentUser.uid, "taxHistory");
+                addDoc(historyRef, {
+                    ...record,
+                    timestamp: serverTimestamp() // Better for sorting in cloud
+                });
+            } catch (err) {
+                console.error("Cloud Save Error:", err);
+            }
+        }
+
+        // 2. Local save removed (Firebase only)
+    });
+}
+
+// Global UI helpers
+window.logout = async () => {
+    try {
+        await signOut(auth);
+        window.location.href = "index.html";
+    } catch (error) {
+        console.error("Logout Error:", error);
+    }
+};
+
+const numberInputs = ["income", "InterestIncome", "RentIncome", "inv80c", "healthIns", "NPS", "otherDeductions"];
+numberInputs.forEach(id => {
+    let el = document.getElementById(id);
+    if(el) {
+        el.addEventListener('input', function(e) {
+            let val = this.value.replace(/[^0-9]/g, '');
+            if (val) this.value = parseInt(val, 10).toLocaleString('en-IN');
+            else this.value = '';
         });
-        localStorage.setItem(historyKey, JSON.stringify(history));
     }
 });
-
-function logout() {
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "login.html";
-}

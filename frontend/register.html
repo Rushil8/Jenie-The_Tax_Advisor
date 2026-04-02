@@ -9,7 +9,15 @@
 </head>
 
 <body>
-    <div class="register-container">
+    <div id="particles-js"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-color: #f8faff;">
+    </div>
+    <header
+        style="position: absolute; top: 0; left: 0; width: 100%; padding: 15px 25px; box-sizing: border-box; background: white; border-bottom: 1px solid #eaeaea; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center; z-index: 10;">
+        <a href="index.html"
+            style="text-decoration: none; color: #1a4bbd; font-size: 26px; font-weight: 800; font-family: 'Inter', Arial, sans-serif;">Jenie</a>
+    </header>
+    <div class="register-container" style="position: relative; z-index: 10;">
         <h1 align="center">Create Account</h1>
         <form id="registerForm">
             <label>Full Name</label>
@@ -33,10 +41,38 @@
         </form>
     </div>
 
-    <script src="../backend/register.js"></script>
-    <footer style="text-align: center; margin-top: 20px; padding: 10px; font-size: 14px; color: #666;">
+    <script type="module" src="../backend/register.js"></script>
+    <footer
+        style="text-align: center; margin-top: 20px; padding: 10px; font-size: 14px; color: #666; position: relative; z-index: 10;">
         &copy; 2026 Jenie. All rights reserved.
     </footer>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#1a4bbd" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": false },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#1a4bbd", "opacity": 0.4, "width": 1 },
+                "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "grab" },
+                    "onclick": { "enable": true, "mode": "push" },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": { "distance": 180, "line_linked": { "opacity": 1 } },
+                    "push": { "particles_nb": 4 }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
 </body>
 
 </html>
