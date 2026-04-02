@@ -4,9 +4,9 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // Wake up the Render server immediately (Cold Start Fix)
-        const API_BASE = "https://jenie-the-tax-advisor.onrender.com";
-        fetch(API_BASE).catch(() => {}); // Fire and forget
+        // Wake up API
+        const API_BASE = "https://jenie-thetaxadvisor.netlify.app";
+        fetch(API_BASE + "/api/chat", { method: "OPTIONS" }).catch(() => {}); // Fire and forget
 
         // Fetch name from Firestore
         const docRef = doc(db, "users", user.uid);

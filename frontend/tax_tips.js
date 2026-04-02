@@ -18,7 +18,7 @@ window.logout = async () => {
 
 const API_BASE = window.location.hostname.includes("127.0.0.1") || window.location.hostname.includes("localhost")
     ? "http://127.0.0.1:5000"
-    : "https://jenie-the-tax-advisor.onrender.com";
+    : "https://jenie-thetaxadvisor.netlify.app";
 
 function getNumVal(id, defaultVal = 0) {
     let el = document.getElementById(id);
@@ -161,7 +161,7 @@ async function fetchAITips(data) {
 
         const resData = await res.json();
 
-        if (!res.ok) throw new Error(resData.error?.message || 'Groq API error');
+        if (!res.ok) throw new Error(resData.error?.message || resData.error || 'Groq API error');
 
         let tipsHtml = resData.choices[0].message.content.trim();
         

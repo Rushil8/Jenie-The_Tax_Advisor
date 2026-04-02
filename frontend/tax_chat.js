@@ -27,7 +27,7 @@ const FALLBACK_ANSWERS = {
 
 const API_BASE = window.location.hostname.includes("127.0.0.1") || window.location.hostname.includes("localhost")
     ? "http://127.0.0.1:5000"
-    : "https://jenie-the-tax-advisor.onrender.com";
+    : "https://jenie-thetaxadvisor.netlify.app";
 
 let chatHistory = [];
 
@@ -97,7 +97,7 @@ window.sendChat = async () => {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error?.message || 'Groq server error');
+        if (!res.ok) throw new Error(data.error?.message || data.error || 'Groq server error');
 
         const answer = data.choices[0].message.content.trim();
         chatHistory.push({ role: 'assistant', content: answer });
