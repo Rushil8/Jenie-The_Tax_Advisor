@@ -108,12 +108,7 @@ window.sendChat = async () => {
         console.error('Groq Chat Error:', err);
         typingDiv.className = 'chat-msg bot';
         
-        let errorMsg = "I'm currently waking up my database! Please give me about 30 seconds and try your question again! ☕";
-        if (err.message.includes('fetch')) {
-            // Keep the wake-up message for network/timeout errors
-        } else {
-             errorMsg = getFallbackAnswer(question);
-        }
+        let errorMsg = `API Error: ${err.message}`;
         typingDiv.innerHTML = errorMsg;
     }
     scrollToBottom();

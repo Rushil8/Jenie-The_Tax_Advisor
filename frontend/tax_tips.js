@@ -175,7 +175,7 @@ async function fetchAITips(data) {
     } catch (err) {
         console.error('Groq fetch failed:', err);
         tipsContent.innerHTML =
-            `<p style="color:#c0392b; font-size:12px; margin-bottom:10px;">⚠️ Connection to AI backend failed. Showing fallback tips.</p>` +
+            `<p style="color:#c0392b; font-size:12px; margin-bottom:10px;">⚠️ Connection to AI backend failed. Error: ${err.message}</p>` +
             getStaticTips(data);
     } finally {
         submitBtn.disabled = false;
