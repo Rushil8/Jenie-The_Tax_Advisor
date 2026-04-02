@@ -18,7 +18,7 @@ window.logout = async () => {
 
 const API_BASE = window.location.hostname.includes("127.0.0.1") || window.location.hostname.includes("localhost")
     ? "http://127.0.0.1:5000"
-    : "https://your-online-app.onrender.com";
+    : "https://jenie-the-tax-advisor.onrender.com";
 
 function getNumVal(id, defaultVal = 0) {
     let el = document.getElementById(id);

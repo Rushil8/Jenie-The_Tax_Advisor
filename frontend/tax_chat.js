@@ -27,7 +27,7 @@ const FALLBACK_ANSWERS = {
 
 const API_BASE = window.location.hostname.includes("127.0.0.1") || window.location.hostname.includes("localhost")
     ? "http://127.0.0.1:5000"
-    : "https://your-online-app.onrender.com";
+    : "https://jenie-the-tax-advisor.onrender.com";
 
 let chatHistory = [];
 
@@ -76,13 +76,13 @@ window.sendChat = async () => {
     appendMessage(question, 'user');
     const typingDiv = appendMessage('Typing...', 'typing');
 
-
+    
     chatHistory.push({ role: 'user', content: question });
 
     try {
         const messages = [
             { role: 'system', content: TAX_FORM_CONTEXT },
-            ...chatHistory.slice(-6)
+            ...chatHistory.slice(-6) 
         ];
 
         const res = await fetch(`${API_BASE}/api/chat`, {
@@ -107,7 +107,14 @@ window.sendChat = async () => {
     } catch (err) {
         console.error('Groq Chat Error:', err);
         typingDiv.className = 'chat-msg bot';
-        typingDiv.innerHTML = getFallbackAnswer(question);
+        
+        let errorMsg = "I'm currently waking up my database! Please give me about 30 seconds and try your question again! ☕";
+        if (err.message.includes('fetch')) {
+            // Keep the wake-up message for network/timeout errors
+        } else {
+             errorMsg = getFallbackAnswer(question);
+        }
+        typingDiv.innerHTML = errorMsg;
     }
     scrollToBottom();
 };

@@ -1,48 +1,73 @@
+
+import { auth, db } from "./firebase-config.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+console.log("Login script loaded.");
 let form = document.getElementById("loginForm");
 let message = document.getElementById("message");
 
-form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+if (form) {
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
+        let identifier = document.getElementById("username").value.trim(); // Can be username or email
+        let password = document.getElementById("password").value;
 
-    // Retain static Admin logic if they still utilize it
-    if (username === "admin" && password === "Admin@123") {
-        alert("Login successful! Welcome Admin!");
-        window.location.href = "admin.html";
-        return;
-    }
-
-    // Auto-detect if we are online or local to switch backend URL natively
-    const API_BASE = window.location.hostname.includes("127.0.0.1") || window.location.hostname.includes("localhost")
-        ? "http://127.0.0.1:5000"
-        : "https://your-online-app.onrender.com"; // <-- You will change this when you host the Python file!
-
-    try {
-        const response = await fetch(API_BASE + "/api/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            // Success: Web Server authorized the login!
-            // Cache the user to local storage for UI state
-            localStorage.setItem("loggedInUser", data.user.username);
-            localStorage.setItem(data.user.username, JSON.stringify(data.user));
-            
-            alert("Login successful! Welcome, " + data.user.name + "!");
-            window.location.href = "dashboard.html";
-        } else {
-            // Failed auth from MySQL server
-            alert(data.error || "Incorrect username or password. Please try again.");
+        // 1. Admin login (Hardcoded for project demo)
+        if (identifier === "admin" && password === "Admin@123") {
+            alert("Login successful! Welcome Admin!");
+            window.location.href = "admin.html";
+            return;
         }
-    } catch (err) {
-        // Fallback or network error
-        console.error("Web Server is unreachable:", err);
-        alert("Could not connect to the Backend Web Server. Ensure python app.py is running!");
-    }
-});
+
+        try {
+            let email = identifier;
+
+            // 2. Resolve username to email if identifier is not an email
+            if (!identifier.includes('@')) {
+                console.log("Checking Firestore for username:", identifier);
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("username", "==", identifier));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    alert("No account found with this username or email.");
+                    return;
+                }
+                const userDataFound = querySnapshot.docs[0].data();
+                email = userDataFound.email;
+                console.log("Username resolved to email:", email);
+            }
+
+            // 3. Login with email and password in Firebase Auth
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // 4. Fetch the full user details from Firestore
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+
+                alert("Login successful! Welcome back, " + userData.name + "!");
+                window.location.href = "dashboard.html";
+            } else {
+                alert("User profile data not found in Firestore.");
+            }
+
+        } catch (error) {
+            console.error("Firebase Login Error:", error.code, error.message);
+            let errMsg = "Login failed: " + error.message;
+            if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                errMsg = "Invalid email/username or password. (Code: " + error.code + ")";
+            } else if (error.code === 'auth/user-disabled') {
+                errMsg = "This account has been disabled.";
+            } else if (error.code === 'auth/network-request-failed') {
+                errMsg = "Network error. Please check your internet connection.";
+            }
+            alert(errMsg);
+        }
+    });
+}
